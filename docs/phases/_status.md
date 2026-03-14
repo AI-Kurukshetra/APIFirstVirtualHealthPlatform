@@ -14,8 +14,8 @@ Tracking rule:
 
 ## Current Snapshot
 
-- Phase 1 is `done`
-- Phases 2-16 are `pending`
+- Phases 1-2 are `done`
+- Phases 3-16 are `pending`
 
 ## Phase 1: Foundation & Auth Infrastructure
 Source: `docs/phases/phase-01-foundation-and-auth.md`
@@ -33,10 +33,10 @@ Source: `docs/phases/phase-02-user-patient-management.md`
 
 | Feature | Status | Notes |
 | --- | --- | --- |
-| Feature 2.1: Admin - User Management | `pending` | |
-| Feature 2.2: Provider Profile Management | `pending` | Prisma model exists, app features not built. |
-| Feature 2.3: Patient Registration & Onboarding | `pending` | Prisma models exist, app features not built. |
-| Feature 2.4: Patient Demographics & Profile View | `pending` | |
+| Feature 2.1: Admin - User Management | `done` | User list, search, role/status filters, pagination, create (invite), edit, deactivate/reactivate, detail view all implemented. |
+| Feature 2.2: Provider Profile Management | `done` | Profile view/edit, specialty, license, NPI, bio, education, languages, completeness %, admin provider list/detail all implemented. **Deferred:** profile photo upload to Supabase Storage — `avatarUrl` field exists, implement later (Phase 16 or standalone). |
+| Feature 2.3: Patient Registration & Onboarding | `done` | 3-step onboarding wizard (personal info, emergency contact, medical basics), skip support, completion tracking, redirect logic all implemented. |
+| Feature 2.4: Patient Demographics & Profile View | `done` | Admin and provider patient list/detail, patient profile view/edit, reusable summary card, completeness indicator all implemented. DOB search skipped (low value, field exists on PatientProfile). |
 
 ## Phase 3: Provider Dashboard & EHR Core
 Source: `docs/phases/phase-03-provider-dashboard-ehr.md`

@@ -116,6 +116,11 @@ export const getSessionContext = cache(async () => {
 
   const appUser = await syncAppUser(authUser)
 
+  if (!appUser.isActive) {
+    await supabase.auth.signOut()
+    return null
+  }
+
   return {
     authUser,
     appUser,
@@ -154,6 +159,28 @@ export function getDefaultDashboardPath(role: Role) {
     default:
       return "/patient"
   }
+}
+
+export async function getHomePathForUser(user: Pick<AppUser, "id" | "role">) {
+  if (user.role === Role.PROVIDER) {
+    const profile = await db.providerProfile.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    })
+
+    return profile ? "/clinical" : "/clinical/profile/edit?setup=1"
+  }
+
+  if (user.role === Role.PATIENT) {
+    const profile = await db.patientProfile.findUnique({
+      where: { userId: user.id },
+      select: { onboardingCompleted: true },
+    })
+
+    return profile?.onboardingCompleted ? "/patient" : "/patient/onboarding"
+  }
+
+  return getDefaultDashboardPath(user.role)
 }
 
 export function getRoleLabel(role: Role) {

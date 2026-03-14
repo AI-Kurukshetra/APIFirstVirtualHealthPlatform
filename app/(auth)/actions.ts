@@ -7,6 +7,7 @@ import { getRequestMetadata, logAudit } from "@/lib/audit"
 import {
   getCurrentAppUser,
   getDefaultDashboardPath,
+  getHomePathForUser,
   syncAppUser,
 } from "@/lib/auth/session"
 import { env } from "@/lib/env"
@@ -120,6 +121,24 @@ export async function signInAction(formData: FormData) {
 
   const appUser = await syncAppUser(data.user, { touchLoginAt: true })
 
+  if (!appUser.isActive) {
+    await supabase.auth.signOut()
+
+    await logAudit({
+      action: "LOGIN_BLOCKED_INACTIVE",
+      details: { email: appUser.email },
+      entity: "AuthSession",
+      entityId: appUser.id,
+      userId: appUser.id,
+    })
+
+    redirect(
+      buildUrl("/login", {
+        error: "This account is inactive. Contact an administrator for access.",
+      })
+    )
+  }
+
   await logAudit({
     userId: appUser.id,
     action: "LOGIN",
@@ -128,7 +147,10 @@ export async function signInAction(formData: FormData) {
     details: { email: appUser.email },
   })
 
-  redirect(next ?? getDefaultDashboardPath(appUser.role))
+  const homePath = await getHomePathForUser(appUser)
+  const defaultPath = getDefaultDashboardPath(appUser.role)
+
+  redirect(homePath === defaultPath && next ? next : homePath)
 }
 
 export async function signUpAction(formData: FormData) {
@@ -229,7 +251,7 @@ export async function signUpAction(formData: FormData) {
   })
 
   if (data.session) {
-    redirect(getDefaultDashboardPath(appUser.role))
+    redirect(await getHomePathForUser(appUser))
   }
 
   redirect(
