@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  if (user && isAuthRoute) {
+  if (user && isAuthRoute && pathname !== "/reset-password") {
     return NextResponse.redirect(new URL("/", request.url))
   }
 

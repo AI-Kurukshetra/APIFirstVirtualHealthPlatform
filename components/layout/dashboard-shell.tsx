@@ -9,10 +9,11 @@ import { NAV_ITEMS } from "@/lib/config/navigation"
 
 interface DashboardShellProps {
   user: User
+  providerTitle?: string | null
   children: React.ReactNode
 }
 
-export function DashboardShell({ user, children }: DashboardShellProps) {
+export function DashboardShell({ user, providerTitle, children }: DashboardShellProps) {
   const navigationItems = NAV_ITEMS.filter((item) =>
     getPermissionsForRole(user.role).includes(item.requiredPermission)
   )
@@ -25,7 +26,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           <Sidebar role={user.role} />
         </div>
         <div className="flex min-h-svh flex-col">
-          <TopNav navigationItems={navigationItems} user={user} />
+          <TopNav navigationItems={navigationItems} user={user} providerTitle={providerTitle} />
           <main className="flex-1 px-6 py-6">
             <div className="mb-6">
               <Breadcrumbs />
