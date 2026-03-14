@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
+import { BreadcrumbLabel } from "@/components/layout/breadcrumb-label"
 import { PatientSummaryCard } from "@/components/patient/summary-card"
 import { db } from "@/lib/db"
 import { ensurePathAccess, requireCurrentAppUser } from "@/lib/auth/session"
@@ -53,6 +54,7 @@ export default async function ClinicalPatientDetailPage({
 
   return (
     <section className="grid gap-6">
+      <BreadcrumbLabel segment={id} label={`${patient.firstName} ${patient.lastName}`} />
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="outline">
           <Link href="/clinical/patients">Back to patient directory</Link>

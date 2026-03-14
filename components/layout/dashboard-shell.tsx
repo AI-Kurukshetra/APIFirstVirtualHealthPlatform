@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/layout/sidebar"
 import { TopNav } from "@/components/layout/top-nav"
 import { getPermissionsForRole } from "@/lib/auth/guards"
 import { NAV_ITEMS } from "@/lib/config/navigation"
+import { BreadcrumbProvider } from "@/lib/breadcrumb-context"
 
 interface DashboardShellProps {
   user: User
@@ -19,6 +20,7 @@ export function DashboardShell({ user, providerTitle, children }: DashboardShell
   )
 
   return (
+    <BreadcrumbProvider>
     <div className="min-h-svh bg-muted/30">
       <SessionTimeout />
       <div className="grid min-h-svh lg:grid-cols-[280px_1fr]">
@@ -36,5 +38,6 @@ export function DashboardShell({ user, providerTitle, children }: DashboardShell
         </div>
       </div>
     </div>
+    </BreadcrumbProvider>
   )
 }

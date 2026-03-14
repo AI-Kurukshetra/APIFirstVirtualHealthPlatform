@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
+import { BreadcrumbLabel } from "@/components/layout/breadcrumb-label"
 import { db } from "@/lib/db"
 import { ensurePathAccess, requireCurrentAppUser } from "@/lib/auth/session"
 import { requirePermission } from "@/lib/auth/guards"
@@ -57,6 +58,8 @@ export default async function NoteDetailPage({
 
   return (
     <section className="grid gap-6">
+      <BreadcrumbLabel segment={id} label={`${note.patient.user.firstName} ${note.patient.user.lastName}`} />
+      <BreadcrumbLabel segment={noteId} label={NOTE_TYPE_LABELS[note.type] ?? note.type} />
       {message && (
         <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
           {message}

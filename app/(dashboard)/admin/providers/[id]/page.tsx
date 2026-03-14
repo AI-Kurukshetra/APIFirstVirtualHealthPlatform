@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
+import { BreadcrumbLabel } from "@/components/layout/breadcrumb-label"
 import { db } from "@/lib/db"
 import {
   ensurePathAccess,
@@ -39,6 +40,7 @@ export default async function AdminProviderDetailPage({
 
   return (
     <section className="grid gap-6">
+      <BreadcrumbLabel segment={id} label={`${provider.firstName} ${provider.lastName}`} />
       <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
