@@ -14,6 +14,15 @@ interface ClinicalPatientDetailPageProps {
   params: Promise<{ id: string }>
 }
 
+const NAV_TABS = [
+  { label: "Overview", href: "" },
+  { label: "Vitals", href: "/vitals" },
+  { label: "Diagnoses", href: "/diagnoses" },
+  { label: "Records", href: "/records" },
+  { label: "Notes", href: "/notes" },
+  { label: "Documents", href: "/documents" },
+]
+
 export default async function ClinicalPatientDetailPage({
   params,
 }: ClinicalPatientDetailPageProps) {
@@ -40,6 +49,8 @@ export default async function ClinicalPatientDetailPage({
     notFound()
   }
 
+  const basePath = `/clinical/patients/${id}`
+
   return (
     <section className="grid gap-6">
       <div className="flex flex-wrap gap-3">
@@ -53,6 +64,18 @@ export default async function ClinicalPatientDetailPage({
         hrefLabel="Back to directory"
         patient={patient}
       />
+
+      <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1.5">
+        {NAV_TABS.map((tab) => (
+          <Link
+            key={tab.href}
+            href={`${basePath}${tab.href}`}
+            className="shrink-0 rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </nav>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">

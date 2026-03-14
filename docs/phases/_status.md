@@ -14,8 +14,8 @@ Tracking rule:
 
 ## Current Snapshot
 
-- Phases 1-2 are `done`
-- Phases 3-16 are `pending`
+- Phases 1-3 are `done`
+- Phases 4-16 are `pending`
 
 ## Phase 1: Foundation & Auth Infrastructure
 Source: `docs/phases/phase-01-foundation-and-auth.md`
@@ -43,10 +43,10 @@ Source: `docs/phases/phase-03-provider-dashboard-ehr.md`
 
 | Feature | Status | Notes |
 | --- | --- | --- |
-| Feature 3.1: Electronic Health Records (EHR) | `pending` | Prisma models exist, app features not built. |
-| Feature 3.2: Clinical Documentation (SOAP Notes) | `pending` | Prisma models exist, app features not built. |
-| Feature 3.3: Provider Dashboard | `pending` | |
-| Feature 3.4: Document Management | `pending` | Prisma model exists, app features not built. |
+| Feature 3.1: Electronic Health Records (EHR) | `done` | Vitals (record, history, auto-BMI), diagnoses (add, group active/chronic/resolved, mark resolved), medical records timeline all implemented. |
+| Feature 3.2: Clinical Documentation (SOAP Notes) | `done` | Create/edit drafts, sign (immutable), delete drafts, note templates (provider + system), `?templateId=` pre-population, admin template management at `/admin/templates`. |
+| Feature 3.3: Provider Dashboard | `done` | Real stat cards (patients, pending drafts, appointments placeholder, profile %), pending notes list, recent patients from activity, quick actions. |
+| Feature 3.4: Document Management | `done` | Upload form, categorized list, patient read-only view, audit logged. **Deferred:** actual file upload to Supabase Storage — currently uses manual URL input. DB record, permissions, and audit log are fully wired; replace `fileUrl` source when Storage is configured. |
 
 ## Phase 4: Appointment Scheduling
 Source: `docs/phases/phase-04-appointment-scheduling.md`
