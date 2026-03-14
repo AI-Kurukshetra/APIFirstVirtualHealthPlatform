@@ -63,7 +63,7 @@
 | Create / manage care plans        |             |       |    ✓     |       |    ✓             |       |         |
 | Manage referrals                  |             |       |    ✓     |       |    ✓             |       |         |
 | Conduct video consultations       |             |       |    ✓     |       |                  |       |         |
-| Manage provider schedule          |             |       |    ✓     |       |                  |   ✓   |         |
+| Manage provider schedule          |             |       |    ✓     |       |                  |       |         |
 | Book appointments (on behalf)     |             |       |    ✓     |       |                  |   ✓   |         |
 | Process insurance verification    |             |       |    ✓     |       |                  |   ✓   |         |
 | Manage invoices / claims          |             |       |          |       |                  |   ✓   |         |

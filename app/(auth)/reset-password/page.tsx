@@ -16,12 +16,17 @@ export default async function ResetPasswordPage({
   const params = await searchParams
   const error =
     typeof params.error === "string" ? params.error : undefined
+  const isInvite = params.invite === "1"
 
   return (
     <AuthShell
-      description="Choose a new password for your account. The link must still be active."
-      eyebrow="Reset Password"
-      title="Set a new password"
+      description={
+        isInvite
+          ? "Welcome! Please set a password to activate your account."
+          : "Choose a new password for your account. The link must still be active."
+      }
+      eyebrow={isInvite ? "Account Setup" : "Reset Password"}
+      title={isInvite ? "Create your password" : "Set a new password"}
     >
       <form action={resetPasswordAction} className="grid gap-5">
         <label className="grid gap-2 text-sm font-medium">

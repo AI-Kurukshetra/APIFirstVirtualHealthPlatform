@@ -117,7 +117,7 @@ export async function createAdminUserAction(formData: FormData) {
         last_name: lastName,
         full_name: `${firstName} ${lastName}`,
       },
-      redirectTo: new URL("/auth/callback", requestOrigin).toString(),
+      redirectTo: new URL("/invite", requestOrigin).toString(),
     })
 
   if (inviteError || !inviteData.user) {
@@ -218,6 +218,7 @@ export async function updateAdminUserAction(userId: string, formData: FormData) 
   }
 
   const isActive = status !== "inactive"
+  const timezone = getString(formData, "timezone") || "UTC"
   const updatedUser = await db.user.update({
     where: { id: user.id },
     data: {
@@ -226,6 +227,7 @@ export async function updateAdminUserAction(userId: string, formData: FormData) 
       isActive,
       lastName,
       role,
+      timezone,
     },
   })
 
@@ -307,11 +309,9 @@ export async function resendInviteAction(userId: string, redirectTo: string) {
 
   if (isConfirmed) {
     // Account is confirmed but has no password — send a password reset email
-    const recoveryUrl = new URL("/auth/callback", requestOrigin)
-    recoveryUrl.searchParams.set("next", "/reset-password")
     const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
       user.email,
-      { redirectTo: recoveryUrl.toString() }
+      { redirectTo: new URL("/invite", requestOrigin).toString() }
     )
     if (resetError) {
       redirect(buildUrl(safeRedirect, { error: resetError.message }))
@@ -320,7 +320,7 @@ export async function resendInviteAction(userId: string, redirectTo: string) {
     // Account is unconfirmed — resend the invite email
     const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
       user.email,
-      { redirectTo: new URL("/auth/callback", requestOrigin).toString() }
+      { redirectTo: new URL("/invite", requestOrigin).toString() }
     )
     if (inviteError) {
       redirect(buildUrl(safeRedirect, { error: inviteError.message }))

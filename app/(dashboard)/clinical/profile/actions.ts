@@ -46,8 +46,13 @@ export async function saveProviderProfileAction(formData: FormData) {
   const languages = parseDelimitedList(getString(formData, "languages"))
   const avatarUrl = getString(formData, "avatarUrl")
   const acceptingNew = formData.get("acceptingNew") === "on"
+  const timezone = getString(formData, "timezone") || "UTC"
 
   await db.$transaction([
+    db.user.update({
+      where: { id: user.id },
+      data: { avatarUrl: avatarUrl || null, timezone },
+    }),
     db.providerProfile.upsert({
       where: { userId: user.id },
       update: {
@@ -72,12 +77,6 @@ export async function saveProviderProfileAction(formData: FormData) {
         specialty,
         title: title || null,
         userId: user.id,
-      },
-    }),
-    db.user.update({
-      where: { id: user.id },
-      data: {
-        avatarUrl: avatarUrl || null,
       },
     }),
   ])

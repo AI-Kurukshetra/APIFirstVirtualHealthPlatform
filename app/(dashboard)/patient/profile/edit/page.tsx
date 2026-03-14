@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { SubmitButton } from "@/components/auth/submit-button"
 import { Button } from "@/components/ui/button"
+import { TimezoneCombobox } from "@/components/ui/timezone-combobox"
 import { db } from "@/lib/db"
 import { ensurePathAccess, requireCurrentAppUser } from "@/lib/auth/session"
 import {
@@ -251,6 +252,14 @@ export default async function PatientProfileEditPage({
               {error}
             </p>
           ) : null}
+
+          <label className="grid gap-2 text-sm font-medium">
+            Timezone
+            <TimezoneCombobox
+              defaultValue={patient.timezone}
+              name="timezone"
+            />
+          </label>
 
           <div className="max-w-56">
             <SubmitButton>Save profile</SubmitButton>

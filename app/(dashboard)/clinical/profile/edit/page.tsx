@@ -28,6 +28,7 @@ export default async function ClinicalProfileEditPage({
     searchParams,
   ])
 
+
   const error = typeof params.error === "string" ? params.error : undefined
   const { saveProviderProfileAction } = await import(
     "@/app/(dashboard)/clinical/profile/actions"
@@ -68,6 +69,7 @@ export default async function ClinicalProfileEditPage({
               licenseState: profile?.licenseState ?? "",
               npiNumber: profile?.npiNumber ?? "",
               specialty: stringifyDelimitedList(profile?.specialty),
+              timezone: user.timezone,
               title: profile?.title ?? "",
             }}
             redirectTo="/clinical/profile/edit"

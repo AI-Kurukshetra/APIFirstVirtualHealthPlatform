@@ -43,6 +43,16 @@ A full-stack digital health management platform built for the AI Mahakurukshetra
 - Medical records timeline
 - Document management — categorized uploads, audit logged
 
+### Phase 4 — Appointment Scheduling
+- Appointment calendar — list view grouped by date (upcoming 60 days + past 30 days), stat cards
+- Book appointment — select patient, provider, type, date/time, duration, reason
+- Appointment detail — full info, status transitions with guard rails (SCHEDULED → CONFIRMED → CHECKED_IN → IN_PROGRESS → COMPLETED)
+- Status management — confirm, check-in, start visit, complete, cancel (with reason), no-show, reschedule
+- Provider availability — set weekly schedule (per day: on/off, start/end time, slot duration)
+- Time off management — add/remove blocked date ranges
+- Patient appointment portal — `/patient/appointments` shows own upcoming and past appointments
+- Role-aware views — providers see own appointments; admins/staff see all; patients see own portal
+
 ---
 
 ## Roles
@@ -133,7 +143,7 @@ prisma/
 | 1 | Foundation & Auth | Done |
 | 2 | User & Patient Management | Done |
 | 3 | Provider Dashboard & EHR | Done |
-| 4 | Appointment Scheduling | Pending |
+| 4 | Appointment Scheduling | Done |
 | 5 | Video Consultation | Pending |
 | 6 | Patient Portal | Pending |
 | 7 | Messaging & Notifications | Pending |

@@ -1,4 +1,5 @@
 import { SubmitButton } from "@/components/auth/submit-button"
+import { TimezoneCombobox } from "@/components/ui/timezone-combobox"
 
 const inputClassName =
   "h-11 rounded-2xl border border-input bg-background px-4 outline-none transition focus:border-primary"
@@ -19,6 +20,7 @@ interface ProviderProfileFormProps {
     licenseState: string
     npiNumber: string
     specialty: string
+    timezone: string
     title: string
   }
   redirectTo: string
@@ -130,6 +132,17 @@ export function ProviderProfileForm({
           placeholder="https://..."
           type="url"
         />
+      </label>
+
+      <label className="grid gap-2 text-sm font-medium">
+        Timezone
+        <TimezoneCombobox
+          defaultValue={initialValues?.timezone ?? "UTC"}
+          name="timezone"
+        />
+        <span className="text-xs text-muted-foreground">
+          Your schedule times are interpreted in this timezone.
+        </span>
       </label>
 
       <label className="flex items-center gap-3 rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium">

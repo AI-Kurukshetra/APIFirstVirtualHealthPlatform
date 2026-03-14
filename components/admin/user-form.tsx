@@ -2,6 +2,7 @@ import { type Role } from "@/prisma/generated/client"
 
 import { SubmitButton } from "@/components/auth/submit-button"
 import { getRoleLabel } from "@/lib/auth/session"
+import { TimezoneCombobox } from "@/components/ui/timezone-combobox"
 
 const inputClassName =
   "h-11 rounded-2xl border border-input bg-background px-4 outline-none transition focus:border-primary"
@@ -16,6 +17,7 @@ interface UserFormProps {
     isActive: boolean
     lastName: string
     role: Role
+    timezone: string
   }
   redirectTo: string
   submitLabel: string
@@ -94,6 +96,16 @@ export function UserForm({
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+        </label>
+      ) : null}
+
+      {initialValues ? (
+        <label className="grid gap-2 text-sm font-medium">
+          Timezone
+          <TimezoneCombobox
+            defaultValue={initialValues.timezone}
+            name="timezone"
+          />
         </label>
       ) : null}
 

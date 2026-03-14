@@ -6,7 +6,14 @@ export const USER_STATUS_FILTERS = ["all", "active", "inactive"] as const
 
 export type UserStatusFilter = (typeof USER_STATUS_FILTERS)[number]
 
-export const ADMIN_INVITE_ROLES: Role[] = [Role.ADMIN, Role.PROVIDER]
+export const ADMIN_INVITE_ROLES: Role[] = [
+  Role.ADMIN,
+  Role.PROVIDER,
+  Role.NURSE,
+  Role.CARE_COORDINATOR,
+  Role.STAFF,
+  Role.PATIENT,
+]
 
 export const SUPER_ADMIN_INVITE_ROLES: Role[] = [
   Role.ADMIN,

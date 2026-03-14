@@ -22,7 +22,18 @@ export default async function AdminEditUserPage({
   ensurePathAccess(currentUser, "/admin/users")
 
   const [{ id }, paramsData] = await Promise.all([params, searchParams])
-  const user = await db.user.findUnique({ where: { id } })
+  const user = await db.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      isActive: true,
+      lastName: true,
+      role: true,
+      timezone: true,
+    },
+  })
 
   if (!user) {
     notFound()
@@ -66,6 +77,7 @@ export default async function AdminEditUserPage({
               isActive: user.isActive,
               lastName: user.lastName,
               role: user.role,
+              timezone: user.timezone,
             }}
             redirectTo={`/admin/users/${user.id}/edit`}
             submitLabel="Save changes"

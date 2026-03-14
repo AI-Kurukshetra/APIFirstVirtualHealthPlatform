@@ -242,10 +242,13 @@ export async function updatePatientProfileAction(formData: FormData) {
     onboardingCompleted: true,
   })
 
+  const timezone = getString(formData, "timezone") || "UTC"
+
   await db.user.update({
     where: { id: user.id },
     data: {
       phone: phone || null,
+      timezone,
     },
   })
 

@@ -14,8 +14,8 @@ Tracking rule:
 
 ## Current Snapshot
 
-- Phases 1-3 are `done`
-- Phases 4-16 are `pending`
+- Phases 1–4 are `done` (Phase 4 has deferred items — see D4-1 through D4-6)
+- Phases 5–16 are `pending`
 
 ## Phase 1: Foundation & Auth Infrastructure
 Source: `docs/phases/phase-01-foundation-and-auth.md`
@@ -53,11 +53,22 @@ Source: `docs/phases/phase-04-appointment-scheduling.md`
 
 | Feature | Status | Notes |
 | --- | --- | --- |
-| Feature 4.1: Provider Availability Management | `pending` | Prisma models exist, app features not built. |
-| Feature 4.2: Appointment Booking | `pending` | Prisma model exists, app features not built. |
-| Feature 4.3: Appointment Calendar View | `pending` | |
-| Feature 4.4: Appointment Management (Reschedule, Cancel, Status) | `pending` | |
-| Feature 4.5: Appointment Reminders & Notifications | `pending` | Notification model exists, delivery flows not built. |
+| Feature 4.1: Provider Availability Management | `done` | Weekly schedule grid (toggle per day, start/end time, slot duration) at `/scheduling/manage`. Time-off add/remove with ownership check. `ProviderBreak` model exists and is respected by the slot engine — **UI to add/edit breaks is deferred** (see D4-5 below). |
+| Feature 4.2: Appointment Booking | `done` | Slot engine (`lib/scheduling/slots.ts`) computes open slots from schedule, time off, breaks, and existing appointments. Authenticated API at `GET /api/scheduling/slots`. Interactive `SlotPicker` client component (provider + duration + date → slot grid). Staff/provider/admin booking at `/scheduling/new`. Double-booking prevented server-side for both provider and patient. Past-date booking blocked. **Patient self-service booking UI deferred** (see D4-1 below). |
+| Feature 4.3: Appointment Calendar View | `done` | List view grouped by date at `/scheduling/calendar`. Stat cards (upcoming, today, completed 30d, cancelled 30d). Role-filtered: providers see own; admins/staff see all. Patient portal at `/patient/appointments` (read-only list). **Day/week/month calendar grid views and admin `/admin/appointments` route are deferred** (see D4-6 below). |
+| Feature 4.4: Appointment Management (Reschedule, Cancel, Status) | `done` | Full status lifecycle enforced server-side: `SCHEDULED → CONFIRMED → CHECKED_IN → IN_PROGRESS → COMPLETED` with `CANCELLED` (with reason), `NO_SHOW`, `RESCHEDULED` branches. IDOR-protected: providers can only update own appointments; ADMIN/SUPER_ADMIN/STAFF can update any. All transitions audit-logged. **Reschedule currently only marks status = RESCHEDULED — it does not create a new linked appointment** (see D4-2 below). **Patient cancel own appointment deferred** (see D4-4 below). |
+| Feature 4.5: Appointment Reminders & Notifications | `pending` | `Notification` model exists in schema. In-app notification bell, reminder scheduling (24h/1h before), email delivery, and notification preferences not built. Deferred to Phase 7. |
+
+### Phase 4 Deferred Items
+
+| ID | Item | Where to implement | Notes |
+| --- | --- | --- | --- |
+| D4-1 | **Patient self-service booking UI** | `app/(dashboard)/patient/appointments/book/page.tsx` | Reuse `SlotPicker`. Action calls `bookAppointmentAction` with `actor.id` auto-filled. Also fix bug in `bookAppointmentAction` line ~81: comparison `ownProfile.id !== patientUserId` compares `PatientProfile.id` vs `User.id` — should be `actor.id !== patientUserId`. Currently unreachable (patients can't reach `/scheduling/new`). |
+| D4-2 | **Reschedule creates a new linked appointment** | `app/(dashboard)/scheduling/actions.ts` + schema | Add optional `rescheduledFromId String?` to `Appointment` model. `updateAppointmentStatusAction` on `RESCHEDULED` transition should mark old appointment and redirect to `/scheduling/new?rescheduledFrom=<id>`. Show reschedule chain on detail page. |
+| D4-3 | **Timezone-aware datetime display and slot engine** | `lib/scheduling/slots.ts`, all scheduling pages | Add `timezone` field to user settings (Phase 15) or `User`. Use `date-fns-tz` for display. Slot engine `getAvailableSlots` uses `new Date().getHours()` for past-slot guard — must become timezone-aware. |
+| D4-4 | **Patient can cancel own appointment** | `app/(dashboard)/patient/appointments/page.tsx` + new action | Add `cancelOwnAppointmentAction` gated on `appointments:create_own`. Verify appointment belongs to patient. Only allow cancel on `SCHEDULED` or `CONFIRMED`. |
+| D4-5 | **Provider breaks UI** | `app/(dashboard)/scheduling/manage/page.tsx` + `manage/actions.ts` | `ProviderBreak` model exists and slot engine already excludes breaks. Add "Breaks" section to manage page. Form: day of week + start time + end time + label. Actions: `addBreakAction` / `deleteBreakAction` following same pattern as time off. |
+| D4-6 | **Day/week/month calendar grid views** | `app/(dashboard)/scheduling/calendar/page.tsx` | Current view is a date-grouped list. A visual grid calendar requires a client-side calendar library (e.g. `react-big-calendar` or custom). Also add `app/(dashboard)/admin/appointments/page.tsx` for admin-specific view. |
 
 ## Phase 5: Video Consultation
 Source: `docs/phases/phase-05-video-consultation.md`
