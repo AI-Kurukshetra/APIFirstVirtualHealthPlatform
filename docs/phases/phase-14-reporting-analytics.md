@@ -37,9 +37,8 @@ components/analytics/
 
 #### Routes
 ```
-app/(dashboard)/admin/
-├── analytics/
-│   └── page.tsx               // Admin analytics dashboard
+app/(dashboard)/analytics/
+├── page.tsx                   // Admin analytics dashboard
 ```
 
 #### How to Test
@@ -91,13 +90,11 @@ app/(dashboard)/admin/
 
 #### Routes
 ```
-app/(dashboard)/admin/
-├── analytics/
-│   └── providers/page.tsx     // Provider performance comparison
+app/(dashboard)/analytics/
+├── providers/page.tsx         // Provider performance comparison
 
-app/(dashboard)/provider/
-├── analytics/
-│   └── page.tsx               // Provider's own performance
+app/(dashboard)/analytics/
+├── me/page.tsx                // Provider's own performance
 ```
 
 #### How to Test

@@ -31,33 +31,28 @@ Enable e-prescribing capabilities with drug interaction checking, prescription t
 #### Database Models
 ```
 Prescription {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  prescriberId    String
-  prescriber      ProviderProfile @relation(fields: [prescriberId])
-  appointmentId   String?
-  drugName        String
-  drugCode        String?          // RxNorm or NDC code
-  dosage          String
-  strength        String?
-  form            String?          // tablet, capsule, liquid
-  frequency       String           // "twice daily", "every 8 hours"
-  route           String?          // oral, topical, IV
-  quantity         Int?
-  daysSupply      Int?
-  refillsAllowed  Int       @default(0)
-  refillsUsed     Int       @default(0)
-  instructions    String?          // Special instructions
-  pharmacy        String?
-  status          PrescriptionStatus @default(ACTIVE)
-  startDate       DateTime
-  endDate         DateTime?
-  discontinuedAt  DateTime?
+  id                 String             @id @default(cuid())
+  patientId          String
+  prescriberId       String
+  drugName           String
+  drugCode           String?            // RxNorm / NDC
+  dosage             String
+  strength           String?
+  form               String?            // tablet, capsule, liquid
+  frequency          String
+  route              String?            // oral, topical, injection
+  quantity           Int?
+  daysSupply         Int?
+  refillsAllowed     Int                @default(0)
+  refillsUsed        Int                @default(0)
+  instructions       String?
+  pharmacy           String?
+  status             PrescriptionStatus @default(DRAFT)
+  startDate          DateTime?
+  endDate            DateTime?
   discontinuedReason String?
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 }
 
 enum PrescriptionStatus {
@@ -73,13 +68,12 @@ enum PrescriptionStatus {
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/prescriptions/
 ├── patients/
 │   └── [id]/
-│       ├── prescriptions/
-│       │   ├── page.tsx          // Prescription list
-│       │   ├── new/page.tsx      // Create prescription
-│       │   └── [rxId]/page.tsx   // Prescription detail
+│       ├── page.tsx              // Prescription list
+│       ├── new/page.tsx          // Create prescription
+│       └── [rxId]/page.tsx       // Prescription detail
 
 app/(dashboard)/patient/
 ├── prescriptions/
@@ -139,18 +133,15 @@ app/(dashboard)/patient/
 #### Database Models
 ```
 RefillRequest {
-  id              String    @id @default(uuid())
+  id              String       @id @default(cuid())
   prescriptionId  String
-  prescription    Prescription @relation(fields: [prescriptionId])
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
   status          RefillStatus @default(PENDING)
-  requestedAt     DateTime  @default(now())
   reviewedById    String?
-  reviewedBy      ProviderProfile? @relation(fields: [reviewedById])
   reviewedAt      DateTime?
   denyReason      String?
-  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
 
 enum RefillStatus {

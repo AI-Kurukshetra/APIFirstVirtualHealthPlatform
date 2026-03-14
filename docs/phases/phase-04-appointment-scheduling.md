@@ -25,43 +25,41 @@ Full appointment lifecycle — provider sets availability, patients book appoint
 #### Database Models
 ```
 ProviderSchedule {
-  id              String    @id @default(uuid())
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  dayOfWeek       Int               // 0=Sun, 1=Mon, ..., 6=Sat
-  startTime       String            // "09:00" (24h format)
-  endTime         String            // "17:00"
-  slotDuration    Int      @default(30) // minutes
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  providerId    String
+  dayOfWeek     Int      // 0=Sunday, 6=Saturday
+  startTime     String   // "09:00"
+  endTime       String   // "17:00"
+  slotDuration  Int      @default(30) // minutes
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 ProviderTimeOff {
-  id              String    @id @default(uuid())
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  startDate       DateTime
-  endDate         DateTime
-  reason          String?
-  createdAt       DateTime @default(now())
+  id          String   @id @default(cuid())
+  providerId  String
+  startDate   DateTime
+  endDate     DateTime
+  reason      String?
+  createdAt   DateTime @default(now())
 }
 
 ProviderBreak {
-  id              String    @id @default(uuid())
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  dayOfWeek       Int
-  startTime       String
-  endTime         String
-  label           String?          // "Lunch", "Break"
+  id          String   @id @default(cuid())
+  providerId  String
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  label       String?
+  createdAt   DateTime @default(now())
 }
 ```
 
 #### Routes
 ```
-app/(dashboard)/provider/
-├── schedule/
+app/(dashboard)/scheduling/
+├── manage/
 │   ├── page.tsx              // View/manage weekly schedule
 │   ├── availability/page.tsx // Set recurring availability
 │   └── time-off/page.tsx     // Manage time-off requests
@@ -96,22 +94,22 @@ app/(dashboard)/provider/
 #### Database Models
 ```
 Appointment {
-  id              String    @id @default(uuid())
+  id              String            @id @default(cuid())
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
   providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
   scheduledStart  DateTime
   scheduledEnd    DateTime
   type            AppointmentType
   status          AppointmentStatus @default(SCHEDULED)
   reason          String?
   notes           String?
-  meetingUrl      String?          // For video appointments (Phase 5)
+  meetingUrl      String?
+  callStartedAt   DateTime?         // Phase 5
+  callEndedAt     DateTime?         // Phase 5
+  callDuration    Int?              // Phase 5 (seconds)
   cancelReason    String?
-  cancelledById   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 }
 
 enum AppointmentType {
@@ -144,9 +142,9 @@ app/(dashboard)/patient/
 │   │   ├── [providerId]/page.tsx // Select date/time for specific provider
 │   │   └── confirm/page.tsx      // Confirm booking
 
-app/(dashboard)/provider/
-├── appointments/
-│   └── book/page.tsx             // Provider books for patient
+app/(dashboard)/scheduling/
+├── book/
+│   └── page.tsx                  // Provider/staff books for patient
 ```
 
 #### How to Test
@@ -175,8 +173,8 @@ app/(dashboard)/provider/
 
 #### Routes
 ```
-app/(dashboard)/provider/
-├── appointments/
+app/(dashboard)/scheduling/
+├── calendar/
 │   ├── page.tsx              // Calendar view (default: week)
 │   └── [id]/page.tsx         // Appointment detail
 
@@ -247,16 +245,15 @@ app/(dashboard)/admin/
 #### Database Models
 ```
 Notification {
-  id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId])
-  type            NotificationType
-  title           String
-  message         String
-  data            Json?             // Additional context (appointmentId, etc.)
-  isRead          Boolean   @default(false)
-  readAt          DateTime?
-  createdAt       DateTime  @default(now())
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
 }
 
 enum NotificationType {

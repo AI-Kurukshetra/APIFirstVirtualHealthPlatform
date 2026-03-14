@@ -28,46 +28,35 @@ Enable lab and diagnostic order management with results tracking. Providers can 
 #### Database Models
 ```
 LabTestCatalog {
-  id              String    @id @default(uuid())
-  code            String    @unique     // LOINC code
+  id              String   @id @default(cuid())
+  code            String   @unique // LOINC code
   name            String
-  category        String               // Chemistry, Hematology, Microbiology, etc.
-  description     String?
-  specimenType    String?              // Blood, Urine, etc.
-  fastingRequired Boolean   @default(false)
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
+  category        String   // Chemistry, Hematology, Microbiology, etc.
+  specimenType    String?
+  fastingRequired Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 LabOrder {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  orderedById     String
-  orderedBy       ProviderProfile @relation(fields: [orderedById])
-  appointmentId   String?
-  priority        LabPriority @default(ROUTINE)
-  status          LabOrderStatus @default(ORDERED)
-  clinicalIndication String?
+  id                  String         @id @default(cuid())
+  patientId           String
+  orderedById         String
+  priority            String         @default("ROUTINE") // ROUTINE, URGENT, STAT
+  status              LabOrderStatus @default(ORDERED)
+  clinicalIndication  String?
   specialInstructions String?
-  orderedAt       DateTime  @default(now())
-  collectedAt     DateTime?
-  resultedAt      DateTime?
-  reviewedAt      DateTime?
-  reviewedById    String?
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 }
 
 LabOrderItem {
-  id              String    @id @default(uuid())
-  labOrderId      String
-  labOrder        LabOrder  @relation(fields: [labOrderId])
-  testId          String
-  test            LabTestCatalog @relation(fields: [testId])
-  status          LabOrderStatus @default(ORDERED)
-  notes           String?
+  id          String   @id @default(cuid())
+  labOrderId  String
+  testId      String
+  status      String   @default("ORDERED")
+  createdAt   DateTime @default(now())
 }
 
 enum LabPriority {
@@ -88,16 +77,15 @@ enum LabOrderStatus {
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/labs/
 ├── patients/
 │   └── [id]/
-│       ├── labs/
-│       │   ├── page.tsx          // Lab orders list
-│       │   ├── new/page.tsx      // Create lab order
-│       │   └── [orderId]/page.tsx // Order detail
+│       ├── page.tsx              // Lab orders list
+│       ├── new/page.tsx          // Create lab order
+│       └── [orderId]/page.tsx    // Order detail
 
-app/(dashboard)/admin/
-├── lab-catalog/
+app/(dashboard)/labs/
+├── catalog/
 │   └── page.tsx                  // Manage lab test catalog
 ```
 
@@ -128,20 +116,20 @@ app/(dashboard)/admin/
 #### Database Models
 ```
 LabResult {
-  id              String    @id @default(uuid())
+  id              String     @id @default(cuid())
   labOrderId      String
-  labOrder        LabOrder  @relation(fields: [labOrderId])
   labOrderItemId  String
-  labOrderItem    LabOrderItem @relation(fields: [labOrderItemId])
   testName        String
   value           String
   unit            String?
-  referenceRange  String?          // "70-100"
-  status          ResultFlag       // NORMAL, LOW, HIGH, CRITICAL
+  referenceRange  String?
+  flag            ResultFlag @default(NORMAL)
   interpretation  String?
-  resultedAt      DateTime  @default(now())
   enteredById     String
-  enteredBy       User      @relation(fields: [enteredById])
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 }
 
 enum ResultFlag {

@@ -28,16 +28,14 @@ Automate repetitive care pathways, task assignments, and clinical protocols — 
 #### Database Models
 ```
 Workflow {
-  id              String    @id @default(uuid())
-  name            String
-  description     String?
-  triggerType      WorkflowTrigger
-  triggerCondition Json?            // Conditions for auto-trigger
-  isActive        Boolean   @default(true)
-  createdById     String
-  createdBy       User      @relation(fields: [createdById])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String          @id @default(cuid())
+  name              String
+  description       String?
+  triggerType       WorkflowTrigger
+  triggerCondition  Json?
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
 
 enum WorkflowTrigger {
@@ -50,19 +48,18 @@ enum WorkflowTrigger {
 }
 
 WorkflowStep {
-  id              String    @id @default(uuid())
-  workflowId      String
-  workflow        Workflow  @relation(fields: [workflowId])
-  stepOrder       Int
-  name            String
-  description     String?
-  actionType      StepActionType
-  actionConfig    Json?            // Config for the action
-  delayDays       Int       @default(0)    // Days after trigger/previous step
-  delayHours      Int       @default(0)
-  assigneeRole    CareTeamRole?
-  isRequired      Boolean   @default(true)
-  createdAt       DateTime  @default(now())
+  id            String         @id @default(cuid())
+  workflowId    String
+  stepOrder     Int
+  name          String
+  actionType    StepActionType
+  actionConfig  Json?
+  delayDays     Int            @default(0)
+  delayHours    Int            @default(0)
+  assigneeRole  String?
+  isRequired    Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 enum StepActionType {
@@ -76,17 +73,16 @@ enum StepActionType {
 }
 
 WorkflowExecution {
-  id              String    @id @default(uuid())
-  workflowId      String
-  workflow        Workflow  @relation(fields: [workflowId])
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  triggeredById   String?
-  triggeredBy     User?     @relation(fields: [triggeredById])
-  status          WorkflowExecutionStatus @default(IN_PROGRESS)
-  currentStep     Int       @default(1)
-  startedAt       DateTime  @default(now())
-  completedAt     DateTime?
+  id            String                  @id @default(cuid())
+  workflowId    String
+  patientId     String
+  triggeredById String?
+  status        WorkflowExecutionStatus @default(IN_PROGRESS)
+  currentStep   Int                     @default(1)
+  startedAt     DateTime                @default(now())
+  completedAt   DateTime?
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
 }
 
 enum WorkflowExecutionStatus {
@@ -100,7 +96,7 @@ enum WorkflowExecutionStatus {
 
 #### Routes
 ```
-app/(dashboard)/admin/
+app/(dashboard)/
 ├── workflows/
 │   ├── page.tsx              // Workflow list
 │   ├── new/page.tsx          // Create workflow

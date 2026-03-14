@@ -25,17 +25,15 @@ Build the clinical core — provider dashboard with patient queue, electronic he
 #### Database Models
 ```
 MedicalRecord {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  type            RecordType     // VITALS, DIAGNOSIS, PROCEDURE, HISTORY, NOTE
-  date            DateTime  @default(now())
-  data            Json      // Flexible JSON for different record types
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String     @id @default(cuid())
+  patientId   String
+  providerId  String
+  type        RecordType
+  date        DateTime
+  data        Json?
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 enum RecordType {
@@ -50,50 +48,41 @@ enum RecordType {
 }
 
 VitalSign {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  recordedById    String
-  recordedBy      User      @relation(fields: [recordedById])
-  bloodPressureSystolic   Int?
-  bloodPressureDiastolic  Int?
-  heartRate       Int?
-  temperature     Float?
-  respiratoryRate Int?
-  oxygenSaturation Float?
-  weight          Float?
-  height          Float?
-  bmi             Float?
-  notes           String?
-  recordedAt      DateTime  @default(now())
+  id                String   @id @default(cuid())
+  patientId         String
+  recordedById      String
+  systolicBP        Float?
+  diastolicBP       Float?
+  heartRate         Float?
+  temperature       Float?
+  respiratoryRate   Float?
+  oxygenSaturation  Float?
+  weight            Float?
+  height            Float?
+  bmi               Float?
+  notes             String?
+  recordedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
 }
 
 Diagnosis {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  icdCode         String?           // ICD-10 code
-  description     String
-  status          DiagnosisStatus   // ACTIVE, RESOLVED, CHRONIC
-  diagnosedDate   DateTime
-  resolvedDate    DateTime?
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-enum DiagnosisStatus {
-  ACTIVE
-  RESOLVED
-  CHRONIC
+  id            String    @id @default(cuid())
+  patientId     String
+  providerId    String
+  icdCode       String
+  description   String
+  status        String    @default("ACTIVE") // ACTIVE, RESOLVED, CHRONIC
+  diagnosedDate DateTime
+  resolvedDate  DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 ```
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── patients/
 │   └── [id]/
 │       ├── records/
@@ -133,32 +122,28 @@ app/(dashboard)/provider/
 #### Database Models
 ```
 ClinicalNote {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  appointmentId   String?          // Link to appointment if applicable
-  type            NoteType
-  status          NoteStatus
-  subjective      String?          // S in SOAP
-  objective       String?          // O in SOAP
-  assessment      String?          // A in SOAP
-  plan            String?          // P in SOAP
-  content         String?          // For non-SOAP notes (progress notes, etc.)
-  templateId      String?          // If created from a template
-  signedAt        DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String     @id @default(cuid())
+  patientId     String
+  providerId    String
+  appointmentId String?
+  type          NoteType   @default(SOAP)
+  status        NoteStatus @default(DRAFT)
+  subjective    String?
+  objective     String?
+  assessment    String?
+  plan          String?
+  signedAt      DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 enum NoteType {
   SOAP
   PROGRESS
-  INITIAL_ASSESSMENT
+  PROCEDURE_NOTE
+  CONSULTATION
+  DISCHARGE
   FOLLOW_UP
-  DISCHARGE_SUMMARY
-  TREATMENT_PLAN
 }
 
 enum NoteStatus {
@@ -169,26 +154,24 @@ enum NoteStatus {
 }
 
 NoteTemplate {
-  id              String    @id @default(uuid())
-  name            String
-  type            NoteType
-  specialty       String?
-  subjective      String?
-  objective       String?
-  assessment      String?
-  plan            String?
-  content         String?
-  isSystem        Boolean   @default(false)   // System-provided vs user-created
-  createdById     String?
-  createdBy       User?     @relation(fields: [createdById])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  type        NoteType
+  subjective  String?
+  objective   String?
+  assessment  String?
+  plan        String?
+  specialty   String?
+  isSystem    Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 ```
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── patients/
 │   └── [id]/
 │       ├── notes/
@@ -198,7 +181,7 @@ app/(dashboard)/provider/
 │       │       ├── page.tsx      // View note
 │       │       └── edit/page.tsx  // Edit draft note
 
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── templates/
 │   ├── page.tsx                  // Template management
 │   └── new/page.tsx              // Create custom template
@@ -237,13 +220,13 @@ app/(dashboard)/admin/
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── page.tsx                      // Provider dashboard home
 ```
 
 #### Components
 ```
-components/provider/
+components/clinical/
 ├── DashboardStats.tsx            // Summary cards
 ├── RecentPatients.tsx            // Recent patients list
 ├── PendingNotes.tsx              // Unsigned notes list
@@ -278,19 +261,17 @@ components/provider/
 #### Database Models
 ```
 Document {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  uploadedById    String
-  uploadedBy      User      @relation(fields: [uploadedById])
-  name            String
-  category        DocumentCategory
-  fileUrl         String            // Supabase Storage URL
-  fileType        String            // MIME type
-  fileSize        Int               // bytes
-  description     String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String           @id @default(cuid())
+  patientId   String
+  uploadedById String
+  name        String
+  category    DocumentCategory
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 enum DocumentCategory {
@@ -298,16 +279,15 @@ enum DocumentCategory {
   IMAGING
   REFERRAL_LETTER
   INSURANCE_CARD
-  IDENTIFICATION
   CONSENT_FORM
-  PRESCRIPTION
+  DISCHARGE_SUMMARY
   OTHER
 }
 ```
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── patients/
 │   └── [id]/
 │       ├── documents/

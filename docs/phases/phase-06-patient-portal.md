@@ -144,27 +144,28 @@ app/(dashboard)/patient/
 #### Database Models
 ```
 Conversation {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  lastMessageAt   DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String           @id @default(cuid())
+  type          ConversationType @default(DIRECT)  // Phase 7 adds GROUP, BROADCAST
+  name          String?                             // Phase 7 (for group conversations)
+  patientId     String
+  providerId    String
+  lastMessageAt DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   @@unique([patientId, providerId])
 }
 
 Message {
-  id              String    @id @default(uuid())
+  id              String    @id @default(cuid())
   conversationId  String
-  conversation    Conversation @relation(fields: [conversationId])
   senderId        String
-  sender          User      @relation(fields: [senderId])
   content         String
+  attachments     Json?     // Phase 7
   isRead          Boolean   @default(false)
   readAt          DateTime?
+  isDeleted       Boolean   @default(false)  // Phase 7
+  deletedAt       DateTime?                   // Phase 7
   createdAt       DateTime  @default(now())
 }
 ```
@@ -176,7 +177,7 @@ app/(dashboard)/patient/
 │   ├── page.tsx              // Conversations list
 │   └── [conversationId]/page.tsx // Chat view
 
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── messages/
 │   ├── page.tsx              // Conversations list
 │   └── [conversationId]/page.tsx // Chat view

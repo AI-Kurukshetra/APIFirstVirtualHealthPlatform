@@ -28,35 +28,33 @@ Enable real-time insurance eligibility checking and benefits verification so pro
 #### Database Models
 ```
 InsurancePayer {
-  id              String    @id @default(uuid())
-  name            String
-  payerId         String?   @unique   // Payer ID for claims
-  address         Json?
-  phone           String?
-  website         String?
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  payerId   String   @unique
+  address   Json?
+  phone     String?
+  website   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 PatientInsurance {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  payerId         String?
-  payer           InsurancePayer? @relation(fields: [payerId])
-  planName        String
-  planType        String?          // HMO, PPO, EPO
-  memberId        String
-  groupNumber     String?
-  priority        InsurancePriority @default(PRIMARY)
-  policyHolder    Json?            // { name, relationship, dob }
-  coverageStart   DateTime?
-  coverageEnd     DateTime?
-  cardFrontUrl    String?          // Uploaded image
-  cardBackUrl     String?          // Uploaded image
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String            @id @default(cuid())
+  patientId     String
+  payerId       String
+  planName      String?
+  planType      InsurancePlanType?
+  memberId      String
+  groupNumber   String?
+  priority      InsurancePriority @default(PRIMARY)
+  policyHolder  Json?
+  coverageStart DateTime?
+  coverageEnd   DateTime?
+  cardFrontUrl  String?
+  cardBackUrl   String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 enum InsurancePriority {
@@ -93,24 +91,19 @@ enum InsurancePriority {
 #### Database Models
 ```
 EligibilityCheck {
-  id              String    @id @default(uuid())
-  patientInsuranceId String
-  patientInsurance PatientInsurance @relation(fields: [patientInsuranceId])
-  checkedById     String
-  checkedBy       User      @relation(fields: [checkedById])
-  status          EligibilityStatus
-  isEligible      Boolean?
-  coverageActive  Boolean?
-  effectiveDate   DateTime?
-  terminationDate DateTime?
-  copay           Float?
-  deductible      Float?
-  deductibleMet   Float?
-  outOfPocketMax  Float?
-  outOfPocketMet  Float?
-  responseData    Json?            // Full API response
-  notes           String?
-  checkedAt       DateTime  @default(now())
+  id                  String            @id @default(cuid())
+  patientInsuranceId  String
+  checkedById         String
+  status              EligibilityStatus @default(NOT_VERIFIED)
+  isEligible          Boolean?
+  coverageActive      Boolean?
+  copay               Float?
+  deductible          Float?
+  deductibleMet       Float?
+  outOfPocketMax      Float?
+  outOfPocketMet      Float?
+  responseData        Json?
+  createdAt           DateTime          @default(now())
 }
 
 enum EligibilityStatus {

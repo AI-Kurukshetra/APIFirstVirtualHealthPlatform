@@ -24,32 +24,25 @@ Implement billing infrastructure — invoice generation from appointments, billi
 #### Database Models
 ```
 BillingCode {
-  id              String    @id @default(uuid())
-  code            String    @unique
-  type            BillingCodeType
-  description     String
-  category        String?
-  defaultPrice    Float?
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-enum BillingCodeType {
-  CPT           // Procedure codes
-  ICD10         // Diagnosis codes
-  HCPCS         // Healthcare supply codes
+  id            String   @id @default(cuid())
+  code          String   @unique
+  type          String   // CPT, ICD10, HCPCS
+  description   String
+  category      String?
+  defaultPrice  Float?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 FeeSchedule {
-  id              String    @id @default(uuid())
-  billingCodeId   String
-  billingCode     BillingCode @relation(fields: [billingCodeId])
-  price           Float
-  effectiveDate   DateTime
-  endDate         DateTime?
-  notes           String?
-  createdAt       DateTime  @default(now())
+  id            String    @id @default(cuid())
+  billingCodeId String
+  price         Float
+  effectiveDate DateTime
+  endDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 ```
 
@@ -80,25 +73,22 @@ FeeSchedule {
 #### Database Models
 ```
 Invoice {
-  id              String    @id @default(uuid())
-  invoiceNumber   String    @unique   // Auto-generated (INV-2026-0001)
+  id              String        @id @default(cuid())
+  invoiceNumber   String        @unique
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
+  providerId      String?
   appointmentId   String?
   status          InvoiceStatus @default(DRAFT)
-  subtotal        Float
-  taxAmount       Float     @default(0)
-  discountAmount  Float     @default(0)
-  totalAmount     Float
-  paidAmount      Float     @default(0)
-  balanceDue      Float
-  dueDate         DateTime
-  paidAt          DateTime?
+  subtotal        Float         @default(0)
+  taxAmount       Float         @default(0)
+  discountAmount  Float         @default(0)
+  totalAmount     Float         @default(0)
+  paidAmount      Float         @default(0)
+  balanceDue      Float         @default(0)
+  dueDate         DateTime?
   notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 enum InvoiceStatus {
@@ -112,16 +102,14 @@ enum InvoiceStatus {
 }
 
 InvoiceLineItem {
-  id              String    @id @default(uuid())
-  invoiceId       String
-  invoice         Invoice   @relation(fields: [invoiceId])
-  billingCodeId   String?
-  billingCode     BillingCode? @relation(fields: [billingCodeId])
-  description     String
-  quantity        Int       @default(1)
-  unitPrice       Float
-  totalPrice      Float
-  notes           String?
+  id            String   @id @default(cuid())
+  invoiceId     String
+  billingCodeId String?
+  description   String
+  quantity      Int      @default(1)
+  unitPrice     Float
+  totalPrice    Float
+  createdAt     DateTime @default(now())
 }
 ```
 
@@ -151,27 +139,20 @@ InvoiceLineItem {
 #### Database Models
 ```
 InsuranceClaim {
-  id              String    @id @default(uuid())
-  claimNumber     String    @unique
-  invoiceId       String
-  invoice         Invoice   @relation(fields: [invoiceId])
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  insurancePlanId String?
-  payerName       String
-  payerId         String?
-  status          ClaimStatus @default(DRAFT)
-  claimAmount     Float
-  approvedAmount  Float?
-  paidAmount      Float?
+  id                    String      @id @default(cuid())
+  claimNumber           String      @unique
+  invoiceId             String
+  patientId             String
+  payerName             String
+  status                ClaimStatus @default(DRAFT)
+  claimAmount           Float
+  approvedAmount        Float?
+  paidAmount            Float?
   patientResponsibility Float?
-  submittedAt     DateTime?
-  processedAt     DateTime?
-  paidAt          DateTime?
-  denialReason    String?
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  denialReason          String?
+  submittedAt           DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 }
 
 enum ClaimStatus {
@@ -212,20 +193,17 @@ enum ClaimStatus {
 #### Database Models
 ```
 Payment {
-  id              String    @id @default(uuid())
+  id              String        @id @default(cuid())
   invoiceId       String
-  invoice         Invoice   @relation(fields: [invoiceId])
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
   amount          Float
   method          PaymentMethod
   stripePaymentId String?
-  status          PaymentStatus
+  status          PaymentStatus @default(PENDING)
   receiptUrl      String?
-  refundedAmount  Float     @default(0)
-  notes           String?
-  paidAt          DateTime  @default(now())
-  createdAt       DateTime  @default(now())
+  refundedAmount  Float?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 enum PaymentMethod {

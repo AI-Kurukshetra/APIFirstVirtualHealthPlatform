@@ -59,11 +59,9 @@ Enhance the basic messaging from Phase 6 into a full-featured secure communicati
   participants    ConversationParticipant[]
 
 ConversationParticipant {
-  id              String    @id @default(uuid())
+  id              String    @id @default(cuid())
   conversationId  String
-  conversation    Conversation @relation(fields: [conversationId])
   userId          String
-  user            User      @relation(fields: [userId])
   joinedAt        DateTime  @default(now())
   leftAt          DateTime?
 

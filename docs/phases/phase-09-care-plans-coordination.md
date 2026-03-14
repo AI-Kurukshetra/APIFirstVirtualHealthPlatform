@@ -27,18 +27,16 @@ Enable multi-provider care coordination with shared care plans, task management,
 #### Database Models
 ```
 CarePlan {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  createdById     String
-  createdBy       ProviderProfile @relation(fields: [createdById])
-  title           String
-  description     String?
-  status          CarePlanStatus @default(ACTIVE)
-  startDate       DateTime
-  endDate         DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String         @id @default(cuid())
+  patientId   String
+  createdById String
+  title       String
+  description String?
+  status      CarePlanStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 enum CarePlanStatus {
@@ -50,17 +48,15 @@ enum CarePlanStatus {
 }
 
 CarePlanGoal {
-  id              String    @id @default(uuid())
-  carePlanId      String
-  carePlan        CarePlan  @relation(fields: [carePlanId])
-  description     String
-  targetDate      DateTime?
-  metric          String?           // Measurable outcome
-  targetValue     String?           // Target for the metric
-  status          GoalStatus @default(IN_PROGRESS)
-  completedAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String     @id @default(cuid())
+  carePlanId  String
+  description String
+  targetDate  DateTime?
+  metric      String?
+  targetValue String?
+  status      GoalStatus @default(NOT_STARTED)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 enum GoalStatus {
@@ -72,21 +68,17 @@ enum GoalStatus {
 }
 
 CarePlanActivity {
-  id              String    @id @default(uuid())
-  carePlanId      String
-  carePlan        CarePlan  @relation(fields: [carePlanId])
-  goalId          String?
-  goal            CarePlanGoal? @relation(fields: [goalId])
-  description     String
-  frequency       String?           // "Daily", "Weekly", "As needed"
-  assignedToId    String?
-  assignedTo      User?     @relation(fields: [assignedToId])
-  status          ActivityStatus @default(PENDING)
-  dueDate         DateTime?
-  completedAt     DateTime?
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String         @id @default(cuid())
+  carePlanId    String
+  goalId        String?
+  description   String
+  frequency     String?
+  assignedToId  String?
+  status        ActivityStatus @default(PENDING)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 enum ActivityStatus {
@@ -123,16 +115,13 @@ enum ActivityStatus {
 #### Database Models
 ```
 CareTeamMember {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  providerId      String
-  provider        ProviderProfile @relation(fields: [providerId])
-  role            CareTeamRole
-  isPrimary       Boolean   @default(false)
-  assignedAt      DateTime  @default(now())
-  removedAt       DateTime?
-  notes           String?
+  id          String       @id @default(cuid())
+  patientId   String
+  providerId  String
+  role        CareTeamRole
+  isPrimary   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@unique([patientId, providerId])
 }
@@ -193,21 +182,16 @@ enum CareTeamRole {
 #### Database Models
 ```
 Referral {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  referringId     String
-  referringProvider ProviderProfile @relation(fields: [referringId])
-  referredToId    String
-  referredToProvider ProviderProfile @relation(fields: [referredToId])
-  reason          String
-  urgency         ReferralUrgency
-  status          ReferralStatus @default(PENDING)
-  notes           String?
-  acceptedAt      DateTime?
-  completedAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String          @id @default(cuid())
+  patientId     String
+  referringId   String
+  referredToId  String?
+  reason        String
+  urgency       ReferralUrgency @default(ROUTINE)
+  status        ReferralStatus  @default(PENDING)
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 enum ReferralUrgency {

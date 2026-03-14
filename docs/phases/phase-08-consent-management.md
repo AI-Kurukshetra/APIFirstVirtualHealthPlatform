@@ -27,18 +27,16 @@ Implement digital consent capture, version control, and tracking for all patient
 #### Database Models
 ```
 ConsentTemplate {
-  id              String    @id @default(uuid())
+  id              String      @id @default(cuid())
   name            String
   type            ConsentType
-  version         Int       @default(1)
-  content         String            // Rich text content
-  acknowledgments Json              // Array of checkbox items
-  isActive        Boolean   @default(true)
-  effectiveDate   DateTime
-  createdById     String
-  createdBy       User      @relation(fields: [createdById])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  version         Int         @default(1)
+  content         String      // Rich text
+  acknowledgments Json?
+  isActive        Boolean     @default(true)
+  effectiveDate   DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 enum ConsentType {
@@ -51,20 +49,19 @@ enum ConsentType {
 }
 
 ConsentRecord {
-  id              String    @id @default(uuid())
+  id              String        @id @default(cuid())
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
   templateId      String
-  template        ConsentTemplate @relation(fields: [templateId])
   templateVersion Int
-  status          ConsentStatus
+  status          ConsentStatus @default(PENDING)
   signedAt        DateTime?
-  signedName      String?          // Typed signature
-  signedIp        String?          // IP at signing
+  signedName      String?
+  signedIp        String?
   revokedAt       DateTime?
   revokeReason    String?
   expiresAt       DateTime?
-  createdAt       DateTime  @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 enum ConsentStatus {

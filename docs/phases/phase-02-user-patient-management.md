@@ -67,26 +67,25 @@ PATCH  /api/users/:id/status — Activate/deactivate
 #### Database Models
 ```
 ProviderProfile {
-  id              String    @id @default(uuid())
-  userId          String    @unique
-  user            User      @relation(fields: [userId])
-  title           String?           // Dr., NP, PA, etc.
-  specialty       String[]          // e.g., ["Primary Care", "Internal Medicine"]
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  title           String?
+  specialty       String[]
   licenseNumber   String?
   licenseState    String?
-  npiNumber       String?           // National Provider Identifier
+  npiNumber       String?
   bio             String?
-  education       Json?             // Array of education entries
+  education       String?
   languages       String[]
-  acceptingNew    Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  acceptingNew    Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 ```
 
 #### Routes
 ```
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── profile/
 │   ├── page.tsx              // View own profile
 │   └── edit/page.tsx         // Edit profile
@@ -119,51 +118,47 @@ app/(dashboard)/admin/
   - Step 1: Personal info (DOB, gender, address, phone)
   - Step 2: Emergency contact
   - Step 3: Basic medical info (known allergies, current medications, conditions)
-  - Step 4: Insurance info (optional at this stage)
 - Onboarding completion status tracking
 - Patient can skip optional steps and complete later
 
 #### Database Models
 ```
 PatientProfile {
-  id                  String    @id @default(uuid())
-  userId              String    @unique
-  user                User      @relation(fields: [userId])
-  dateOfBirth         DateTime?
-  gender              String?
-  bloodType           String?
-  address             Json?     // { street, city, state, zip, country }
-  emergencyContact    Json?     // { name, relationship, phone, email }
-  onboardingCompleted Boolean   @default(false)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  dateOfBirth           DateTime?
+  gender                String?
+  bloodType             String?
+  address               Json?
+  emergencyContact      Json?
+  onboardingCompleted   Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 Allergy {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  allergen        String
-  severity        String    // mild, moderate, severe
-  reaction        String?
-  notes           String?
-  reportedAt      DateTime  @default(now())
+  id          String   @id @default(cuid())
+  patientId   String
+  allergen    String
+  severity    String   // mild, moderate, severe
+  reaction    String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 Medication {
-  id              String    @id @default(uuid())
-  patientId       String
-  patient         PatientProfile @relation(fields: [patientId])
-  name            String
-  dosage          String?
-  frequency       String?
-  prescribedBy    String?
-  startDate       DateTime?
-  endDate         DateTime?
-  isActive        Boolean   @default(true)
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  patientId     String
+  name          String
+  dosage        String?
+  frequency     String?
+  prescribedBy  String?
+  startDate     DateTime?
+  endDate       DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 ```
 
@@ -209,7 +204,7 @@ app/(dashboard)/admin/
 │   ├── page.tsx              // Patient list (admin)
 │   └── [id]/page.tsx         // Patient detail (admin)
 
-app/(dashboard)/provider/
+app/(dashboard)/clinical/
 ├── patients/
 │   ├── page.tsx              // Patient list (provider)
 │   └── [id]/page.tsx         // Patient detail (provider)
